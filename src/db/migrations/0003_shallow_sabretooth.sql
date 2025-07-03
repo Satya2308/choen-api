@@ -1,0 +1,1 @@
+ALTER TABLE "profession" ALTER COLUMN "second" DROP NOT NULL;
