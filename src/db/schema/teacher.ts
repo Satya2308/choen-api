@@ -7,15 +7,50 @@ import {
   text,
   timestamp
 } from "drizzle-orm/pg-core"
-import { schoolClass } from "./schoolClass"
 import { relations } from "drizzle-orm"
-import { subject } from "./subject"
-import { profession } from "./profession"
 import { user } from "./user"
-import { krobkan } from "./krobkan"
-import { rank } from "./rank"
 
 export const gender = pgEnum("gender", ["MALE", "FEMALE"])
+
+export const rank = pgEnum("rank", [
+  "ក.1.1",
+  "ក.1.2",
+  "ក.1.3",
+  "ក.1.4",
+  "ក.1.5",
+  "ក.1.6",
+  "ក.2.1",
+  "ក.2.2",
+  "ក.2.3",
+  "ក.2.4",
+  "ក.3.1",
+  "ក.3.2",
+  "ក.3.3",
+  "ក.3.4",
+  "ខ.1.1",
+  "ខ.1.2",
+  "ខ.1.3",
+  "ខ.1.4",
+  "ខ.1.5",
+  "ខ.1.6",
+  "ខ.2.1",
+  "ខ.2.2",
+  "ខ.2.3",
+  "ខ.2.4",
+  "ខ.3.1",
+  "ខ.3.2",
+  "ខ.3.3",
+  "ខ.3.4",
+  "គ.1",
+  "គ.2",
+  "គ.3",
+  "គ.4",
+  "គ.5",
+  "គ.6",
+  "គ.7",
+  "គ.8",
+  "គ.9"
+])
 
 export const teacher = pgTable("teacher", {
   id: serial("id").primaryKey(),
@@ -23,28 +58,13 @@ export const teacher = pgTable("teacher", {
   code: text("code").notNull().unique(),
   gender: gender("gender"),
   dob: date("dob"),
+  subject: text("subject"),
+  class: text("class"),
+  profession: text("profession"),
+  krobkan: text("krobkan"),
+  rank: rank("rank"),
   userId: integer("userId").references(() => user.id, {
     onDelete: "cascade",
-    onUpdate: "cascade"
-  }),
-  subjectId: integer("subjectId").references(() => subject.id, {
-    onDelete: "set null",
-    onUpdate: "cascade"
-  }),
-  schoolClassId: integer("schoolClassId").references(() => schoolClass.id, {
-    onDelete: "set null",
-    onUpdate: "cascade"
-  }),
-  professionId: integer("professionId").references(() => profession.id, {
-    onDelete: "set null",
-    onUpdate: "cascade"
-  }),
-  krobkanId: integer("krobkanId").references(() => krobkan.id, {
-    onDelete: "set null",
-    onUpdate: "cascade"
-  }),
-  rankId: integer("rankId").references(() => rank.id, {
-    onDelete: "set null",
     onUpdate: "cascade"
   }),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
@@ -55,25 +75,5 @@ export const teacherRelations = relations(teacher, ({ one }) => ({
   user: one(user, {
     fields: [teacher.userId],
     references: [user.id]
-  }),
-  schoolClass: one(schoolClass, {
-    fields: [teacher.schoolClassId],
-    references: [schoolClass.id]
-  }),
-  subject: one(subject, {
-    fields: [teacher.subjectId],
-    references: [subject.id]
-  }),
-  profession: one(profession, {
-    fields: [teacher.professionId],
-    references: [profession.id]
-  }),
-  krobkan: one(krobkan, {
-    fields: [teacher.krobkanId],
-    references: [krobkan.id]
-  }),
-  rank: one(rank, {
-    fields: [teacher.rankId],
-    references: [rank.id]
   })
 }))
