@@ -19,7 +19,7 @@ export const teacher = pgTable("teacher", {
   gender: gender("gender"),
   dob: date("dob"),
   subject: text("subject"),
-  class: text("class"),
+  classroom: text("classroom"),
   profession: text("profession"),
   krobkan: text("krobkan"),
   rank: text("rank"),
