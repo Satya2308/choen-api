@@ -1,11 +1,10 @@
-import { Module } from "@nestjs/common"
+import { Global, Module } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
-import pg from "pg"
 import schema from "./db/schema"
+import { Pool } from "pg"
 import { drizzle } from "drizzle-orm/node-postgres"
 
-const { Pool } = pg
-
+@Global()
 @Module({
   providers: [
     {
