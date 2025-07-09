@@ -49,4 +49,10 @@ export class CreateTeacherDto {
   @IsOptional()
   @IsInt()
   userId?: number
+
+  @IsString()
+  phone: string
+
+  @IsString()
+  password: string
 }
