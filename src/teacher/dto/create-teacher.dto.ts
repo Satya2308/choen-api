@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsInt
 } from "class-validator"
+import { IsPhoneUnique } from "../validator/is-phone-unique.validator"
 
 export enum Gender {
   MALE = "MALE",
@@ -51,6 +52,7 @@ export class CreateTeacherDto {
   userId?: number
 
   @IsString()
+  @IsPhoneUnique({ message: "Phone number is already used" })
   phone: string
 
   @IsString()
