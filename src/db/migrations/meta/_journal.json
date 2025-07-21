@@ -29,6 +29,13 @@
       "when": 1753082143545,
       "tag": "0003_fresh_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1753086666849,
+      "tag": "0004_previous_wendigo",
+      "breakpoints": true
     }
   ]
 }
