@@ -6,7 +6,7 @@ import {
   ValidationOptions
 } from "class-validator"
 import { Injectable } from "@nestjs/common"
-import { Inject } from "@nestjs/common" // your inferred drizzle type
+import { Inject } from "@nestjs/common"
 import { Database } from "src/db/type"
 import { user } from "src/db/schema"
 import { eq } from "drizzle-orm"
