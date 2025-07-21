@@ -21,6 +21,7 @@ export const teacher = pgTable("teacher", {
   subject: text("subject"),
   classroom: text("classroom"),
   profession: text("profession"),
+  profession1: text("profession1"),
   krobkan: text("krobkan"),
   rank: text("rank"),
   userId: integer("userId").references(() => user.id, {

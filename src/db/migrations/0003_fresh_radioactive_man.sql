@@ -1,0 +1,1 @@
+ALTER TABLE "teacher" ADD COLUMN "profession1" text;
