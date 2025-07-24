@@ -7,8 +7,8 @@ import {
 } from "class-validator"
 import { Injectable } from "@nestjs/common"
 import { Inject } from "@nestjs/common"
-import { Database } from "src/db/type"
-import { user } from "src/db/schema"
+import { Database } from "db/type"
+import { user } from "db/schema"
 import { eq } from "drizzle-orm"
 
 @ValidatorConstraint({ async: true })

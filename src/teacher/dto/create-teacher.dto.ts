@@ -33,11 +33,11 @@ export class CreateTeacherDto {
 
   @IsOptional()
   @IsString()
-  classroom?: string
+  profession1?: string
 
   @IsOptional()
   @IsString()
-  profession?: string
+  profession2?: string
 
   @IsOptional()
   @IsString()
