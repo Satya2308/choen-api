@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsIn,
-  IsDateString,
-  IsInt
-} from "class-validator"
+import { IsString, IsOptional, IsIn, IsDateString } from "class-validator"
 import { IsPhoneUnique } from "../validator/is-phone-unique.validator"
 
 export enum Gender {
@@ -18,6 +12,10 @@ export class CreateTeacherDto {
 
   @IsString()
   code: string
+
+  @IsString()
+  @IsPhoneUnique({ message: "លេខទូរស័ព្ទនេះមាននៅក្នុងប្រព័ន្ធរួចហើយ" })
+  phone: string
 
   @IsOptional()
   @IsIn([Gender.MALE, Gender.FEMALE])
@@ -46,15 +44,4 @@ export class CreateTeacherDto {
   @IsOptional()
   @IsString()
   rank?: string
-
-  @IsOptional()
-  @IsInt()
-  userId?: number
-
-  @IsString()
-  @IsPhoneUnique({ message: "Phone number is already used" })
-  phone: string
-
-  @IsString()
-  password: string
 }

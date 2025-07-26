@@ -1,7 +1,7 @@
-import { ValidationPipe } from "@nestjs/common"
+import { BadRequestException, ValidationPipe } from "@nestjs/common"
 import { NestFactory } from "@nestjs/core"
 import { AppModule } from "./app.module"
-import { useContainer } from "class-validator"
+import { useContainer, ValidationError } from "class-validator"
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -21,6 +21,19 @@ async function bootstrap() {
       transform: true, // Automatically transform payloads to DTO instances
       transformOptions: {
         enableImplicitConversion: true // Automatically convert types
+      },
+      exceptionFactory: (errors: ValidationError[]) => {
+        const formattedErrors: Record<string, string[]> = {}
+        for (const error of errors) {
+          if (error.constraints) {
+            formattedErrors[error.property] = Object.values(error.constraints)
+          }
+        }
+        throw new BadRequestException({
+          statusCode: 400,
+          message: formattedErrors,
+          error: "Bad Request"
+        })
       }
     })
   )

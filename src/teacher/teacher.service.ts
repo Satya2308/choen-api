@@ -1,24 +1,42 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
-import { Database } from "src/db/type"
-import * as schema from "src/db/schema"
+import { Database } from "db/type"
+import * as schema from "db/schema"
+import { eq, getTableColumns } from "drizzle-orm"
 
 @Injectable()
 export class TeacherService {
   constructor(@Inject("DATABASE_CONNECTION") private readonly db: Database) {}
   async create(createTeacherDto: CreateTeacherDto) {
-    const { phone, password, ...data } = createTeacherDto
-    const user = await this.db
-      .insert(schema.user)
-      .values({ phone, password })
-      .returning()
+    const userSchema = schema.user
+    const teacherSchema = schema.teacher
+    const { phone, ...data } = createTeacherDto
+    console.log("phone", phone)
+    console.log("data", data)
+    const user = await this.db.insert(userSchema).values({ phone }).returning()
     const param = { ...data, userId: user[0].id }
-    await this.db.insert(schema.teacher).values(param).returning()
+    await this.db
+      .insert(teacherSchema)
+      .values(param)
+      .returning()
+      .then(res => res[0])
+    return { message: "Teacher created successfully" }
   }
 
-  findAll() {
-    return `This action returns all teacher`
+  async findAll() {
+    const teacherSchema = schema.teacher
+    const userSchema = schema.user
+    return await this.db
+      .select({
+        ...getTableColumns(teacherSchema),
+        user: {
+          phone: userSchema.phone,
+          password: userSchema.password
+        }
+      })
+      .from(teacherSchema)
+      .leftJoin(userSchema, eq(userSchema.id, teacherSchema.userId))
   }
 
   findOne(id: number) {

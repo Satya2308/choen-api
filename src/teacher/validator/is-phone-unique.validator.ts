@@ -24,7 +24,7 @@ export class IsPhoneUniqueConstraint implements ValidatorConstraintInterface {
   }
 
   defaultMessage(_args: ValidationArguments) {
-    return "Phone number already exists"
+    return "លេខទូរស័ព្ទនេះមាននៅក្នុងប្រព័ន្ធរួចហើយ"
   }
 }
 

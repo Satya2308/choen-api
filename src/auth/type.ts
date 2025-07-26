@@ -7,6 +7,6 @@ export type LoginInput = Omit<User, "password">
 
 export type UserInput = InferInsertModel<typeof schema.user>
 
-export type ValidateUserInput = Pick<UserInput, "phone" | "password">
+export type ValidateUserInput = { phone: string; password: string }
 
 export type AccessToken = Pick<User, "id" | "phone">
