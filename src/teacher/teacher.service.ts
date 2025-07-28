@@ -76,9 +76,7 @@ export class TeacherService {
 
   async remove(id: number) {
     const teacherSchema = schema.teacher
-    const res = await this.db
-      .delete(teacherSchema)
-      .where(eq(teacherSchema.id, id))
+    await this.db.delete(teacherSchema).where(eq(teacherSchema.id, id))
     return { message: "Teacher deleted successfully" }
   }
 }
