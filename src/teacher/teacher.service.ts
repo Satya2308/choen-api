@@ -74,7 +74,11 @@ export class TeacherService {
     return { message: "Teacher updated successfully" }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} teacher`
+  async remove(id: number) {
+    const teacherSchema = schema.teacher
+    const res = await this.db
+      .delete(teacherSchema)
+      .where(eq(teacherSchema.id, id))
+    return { message: "Teacher deleted successfully" }
   }
 }

@@ -31,15 +31,15 @@ export class TeacherController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
-    console.log("ok")
-    console.log("id", id)
-    console.log("updateTeacherDto", updateTeacherDto)
-    return this.teacherService.update(+id, updateTeacherDto)
+  async update(
+    @Param("id") id: string,
+    @Body() updateTeacherDto: UpdateTeacherDto
+  ) {
+    return await this.teacherService.update(+id, updateTeacherDto)
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.teacherService.remove(+id)
+  async remove(@Param("id") id: string) {
+    return await this.teacherService.remove(+id)
   }
 }
