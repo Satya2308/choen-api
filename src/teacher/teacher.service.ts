@@ -71,12 +71,12 @@ export class TeacherService {
       .update(teacherSchema)
       .set(data)
       .where(eq(teacherSchema.id, id))
-    return { message: "Teacher updated successfully" }
+    return { message: "ទិន្នន័យគ្រូត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ" }
   }
 
   async remove(id: number) {
     const teacherSchema = schema.teacher
     await this.db.delete(teacherSchema).where(eq(teacherSchema.id, id))
-    return { message: "Teacher deleted successfully" }
+    return { message: "គ្រូបានលុបដោយជោគជ័យ" }
   }
 }
