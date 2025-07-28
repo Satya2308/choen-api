@@ -18,7 +18,6 @@ export class AuthController {
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response
   ) {
-    console.log("dto", dto)
     const user = await this.authService.validateUser(dto)
     if (!user) throw new UnauthorizedException("Invalid credentials")
     const { accessToken, refreshToken } = await this.authService.login(user)

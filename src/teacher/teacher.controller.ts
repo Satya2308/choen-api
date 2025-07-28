@@ -11,7 +11,7 @@ import { TeacherService } from "./teacher.service"
 import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
 
-@Controller("teacher")
+@Controller("teachers")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
@@ -26,12 +26,15 @@ export class TeacherController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.teacherService.findOne(+id)
+  async findOne(@Param("id") id: string) {
+    return await this.teacherService.findOne(+id)
   }
 
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateTeacherDto: UpdateTeacherDto) {
+    console.log("ok")
+    console.log("id", id)
+    console.log("updateTeacherDto", updateTeacherDto)
     return this.teacherService.update(+id, updateTeacherDto)
   }
 

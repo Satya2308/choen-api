@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common"
+import { Inject, Injectable, NotFoundException } from "@nestjs/common"
 import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
 import { Database } from "db/type"
@@ -12,8 +12,6 @@ export class TeacherService {
     const userSchema = schema.user
     const teacherSchema = schema.teacher
     const { phone, ...data } = createTeacherDto
-    console.log("phone", phone)
-    console.log("data", data)
     const user = await this.db.insert(userSchema).values({ phone }).returning()
     const param = { ...data, userId: user[0].id }
     await this.db
@@ -30,21 +28,50 @@ export class TeacherService {
     return await this.db
       .select({
         ...getTableColumns(teacherSchema),
-        user: {
-          phone: userSchema.phone,
-          password: userSchema.password
-        }
+        phone: userSchema.phone
       })
       .from(teacherSchema)
       .leftJoin(userSchema, eq(userSchema.id, teacherSchema.userId))
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`
+  async findOne(id: number) {
+    const teacherSchema = schema.teacher
+    const userSchema = schema.user
+    const teacher = await this.db
+      .select({
+        ...getTableColumns(teacherSchema),
+        phone: userSchema.phone
+      })
+      .from(teacherSchema)
+      .where(eq(teacherSchema.id, id))
+      .leftJoin(userSchema, eq(userSchema.id, teacherSchema.userId))
+      .then(res => res[0])
+    if (!teacher) throw new NotFoundException(`Teacher with ID ${id} not found`)
+    return teacher
   }
 
-  update(id: number, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`
+  async update(id: number, updateTeacherDto: UpdateTeacherDto) {
+    const userSchema = schema.user
+    const teacherSchema = schema.teacher
+    const { phone, ...data } = updateTeacherDto
+    const teacher = await this.db
+      .select()
+      .from(teacherSchema)
+      .where(eq(teacherSchema.id, id))
+      .then(res => res[0])
+    const userId = teacher.userId
+    if (userId && phone) {
+      await this.db
+        .update(userSchema)
+        .set({ phone })
+        .where(eq(userSchema.id, userId))
+        .returning()
+    }
+    await this.db
+      .update(teacherSchema)
+      .set(data)
+      .where(eq(teacherSchema.id, id))
+    return { message: "Teacher updated successfully" }
   }
 
   remove(id: number) {
