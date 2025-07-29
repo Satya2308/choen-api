@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core"
 import { relations } from "drizzle-orm"
 import { user } from "./user"
+import { classAssignment, classroom } from "./classroom"
 
 export const gender = pgEnum("gender", ["MALE", "FEMALE"])
 
@@ -31,9 +32,11 @@ export const teacher = pgTable("teacher", {
   updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
 })
 
-export const teacherRelations = relations(teacher, ({ one }) => ({
+export const teacherRelations = relations(teacher, ({ one, many }) => ({
   user: one(user, {
     fields: [teacher.userId],
     references: [user.id]
-  })
+  }),
+  classAssignments: many(classAssignment),
+  leadClassrooms: many(classroom)
 }))
