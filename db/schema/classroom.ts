@@ -7,11 +7,12 @@ import { relations } from "drizzle-orm"
 export const classroom = pgTable("classroom", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  description: text("description"),
   yearId: integer("yearId")
     .references(() => year.id)
     .notNull(),
-  leadTeacherId: integer("leadTeacherId").references(() => teacher.id),
+  leadTeacherId: integer("leadTeacherId")
+    .references(() => teacher.id)
+    .notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
 })

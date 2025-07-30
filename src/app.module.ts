@@ -7,6 +7,7 @@ import { ConfigModule } from "@nestjs/config"
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { YearModule } from './year/year.module';
+import { ClassroomModule } from './classroom/classroom.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { YearModule } from './year/year.module';
     TeacherModule,
     UsersModule,
     AuthModule,
-    YearModule
+    YearModule,
+    ClassroomModule
   ],
   controllers: [AppController],
   providers: [AppService]
