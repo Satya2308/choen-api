@@ -1,0 +1,1 @@
+ALTER TABLE "classroom" ALTER COLUMN "leadTeacherId" SET NOT NULL;
