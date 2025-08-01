@@ -1,7 +1,6 @@
 import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
-import { year } from "./year"
+import { timeslot, year } from "./year"
 import { teacher } from "./teacher"
-import { timeslot } from "./timeslot"
 import { relations } from "drizzle-orm"
 
 export const classroom = pgTable("classroom", {

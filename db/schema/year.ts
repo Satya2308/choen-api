@@ -1,13 +1,14 @@
 import { relations } from "drizzle-orm"
 import {
   boolean,
+  integer,
   pgEnum,
   pgTable,
   serial,
   text,
   timestamp
 } from "drizzle-orm/pg-core"
-import { classroom } from "./classroom"
+import { classroom, classAssignment } from "./classroom"
 
 export const classDurationEnum = pgEnum("classDuration", ["1_hour", "1_5_hour"])
 
@@ -22,4 +23,17 @@ export const year = pgTable("year", {
 
 export const yearsRelations = relations(year, ({ many }) => ({
   classrooms: many(classroom)
+}))
+
+export const timeslot = pgTable("timeslot", {
+  id: serial("id").primaryKey(),
+  label: text("label").notNull(),
+  duration: classDurationEnum("duration").notNull(),
+  sortOrder: integer("sortOrder").notNull(),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
+})
+
+export const timeSlotsRelations = relations(timeslot, ({ many }) => ({
+  assignments: many(classAssignment)
 }))
