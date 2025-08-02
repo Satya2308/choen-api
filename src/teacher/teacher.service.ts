@@ -94,4 +94,16 @@ export class TeacherService {
       .orderBy(desc(teacherSchema.name))
       .limit(limit)
   }
+
+  async findFirstTwenty() {
+    const teacherSchema = schema.teacher
+    return await this.db
+      .select({
+        id: teacherSchema.id,
+        name: teacherSchema.name
+      })
+      .from(teacherSchema)
+      .orderBy(desc(teacherSchema.name))
+      .limit(20)
+  }
 }

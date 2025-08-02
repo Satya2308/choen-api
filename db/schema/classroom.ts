@@ -7,11 +7,15 @@ export const classroom = pgTable("classroom", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   yearId: integer("yearId")
-    .references(() => year.id)
+    .references(() => year.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade"
+    })
     .notNull(),
-  leadTeacherId: integer("leadTeacherId")
-    .references(() => teacher.id)
-    .notNull(),
+  leadTeacherId: integer("leadTeacherId").references(() => teacher.id, {
+    onDelete: "set null",
+    onUpdate: "cascade"
+  }),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
 })
@@ -31,11 +35,22 @@ export const classesRelations = relations(classroom, ({ one, many }) => ({
 export const classAssignment = pgTable("classAssignment", {
   id: serial("id").primaryKey(),
   classroomId: integer("classroomId")
-    .references(() => classroom.id)
+    .references(() => classroom.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade"
+    })
     .notNull(),
-  teacherId: integer("teacherId").references(() => teacher.id),
+  teacherId: integer("teacherId")
+    .references(() => teacher.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade"
+    })
+    .notNull(),
   timeslotId: integer("timeslotId")
-    .references(() => timeslot.id)
+    .references(() => timeslot.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade"
+    })
     .notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())

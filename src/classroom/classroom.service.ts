@@ -43,7 +43,7 @@ export class ClassroomService {
         )`
       })
       .from(classroomSchema)
-      .innerJoin(
+      .leftJoin(
         teacherSchema,
         eq(classroomSchema.leadTeacherId, teacherSchema.id)
       )
@@ -55,11 +55,12 @@ export class ClassroomService {
     const teacherSchema = schema.teacher
     return await this.db
       .select({
+        id: classroomSchema.id,
         name: classroomSchema.name,
         teacher: { id: teacherSchema.id, name: schema.teacher.name }
       })
       .from(classroomSchema)
-      .innerJoin(
+      .leftJoin(
         teacherSchema,
         eq(classroomSchema.leadTeacherId, teacherSchema.id)
       )
@@ -68,14 +69,14 @@ export class ClassroomService {
   }
 
   async update(id: number, updateClassroomDto: UpdateClassroomDto) {
-    const { name, leadTeacherId, yearId } = updateClassroomDto
     const classroomSchema = schema.classroom
-    const ok = await this.db
+    await this.db
       .update(classroomSchema)
       .set(updateClassroomDto)
       .where(eq(classroomSchema.id, id))
       .returning()
       .then(res => res[0])
+    return { message: "ទិន្នន័យថ្នាក់ត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ" }
   }
 
   async remove(id: number) {

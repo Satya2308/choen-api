@@ -32,6 +32,11 @@ export class TeacherController {
     return await this.teacherService.searchTeachers(query.q, query.limit)
   }
 
+  @Get("firstTwenty")
+  async findFirstTen() {
+    return await this.teacherService.findFirstTwenty()
+  }
+
   @Get(":id")
   async findOne(@Param("id") id: string) {
     return await this.teacherService.findOne(+id)
