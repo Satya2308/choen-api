@@ -27,7 +27,7 @@ export class ClassroomService {
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { name: teacherSchema.name },
+        teacher: { id: teacherSchema.id, name: teacherSchema.name },
         assignedTimeslots: sql<number>`(
           SELECT COUNT(*) 
           FROM ${classAssignmentSchema} 
@@ -52,16 +52,25 @@ export class ClassroomService {
 
   async findOne(id: number) {
     const classroomSchema = schema.classroom
+    const teacherSchema = schema.teacher
     return await this.db
-      .select()
+      .select({
+        name: classroomSchema.name,
+        teacher: { id: teacherSchema.id, name: schema.teacher.name }
+      })
       .from(classroomSchema)
+      .innerJoin(
+        teacherSchema,
+        eq(classroomSchema.leadTeacherId, teacherSchema.id)
+      )
       .where(eq(classroomSchema.id, id))
       .then(res => res[0])
   }
 
   async update(id: number, updateClassroomDto: UpdateClassroomDto) {
+    const { name, leadTeacherId, yearId } = updateClassroomDto
     const classroomSchema = schema.classroom
-    return await this.db
+    const ok = await this.db
       .update(classroomSchema)
       .set(updateClassroomDto)
       .where(eq(classroomSchema.id, id))

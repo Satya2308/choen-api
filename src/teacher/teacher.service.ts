@@ -3,7 +3,7 @@ import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
 import { Database } from "db/type"
 import * as schema from "db/schema"
-import { eq, getTableColumns } from "drizzle-orm"
+import { eq, getTableColumns, ilike, desc } from "drizzle-orm"
 
 @Injectable()
 export class TeacherService {
@@ -78,5 +78,20 @@ export class TeacherService {
     const teacherSchema = schema.teacher
     await this.db.delete(teacherSchema).where(eq(teacherSchema.id, id))
     return { message: "គ្រូបានលុបដោយជោគជ័យ" }
+  }
+
+  async searchTeachers(query: string, limit: number = 20) {
+    const teacherSchema = schema.teacher
+    if (!query?.trim()) return []
+    const searchTerm = `%${query.trim()}%`
+    return await this.db
+      .select({
+        id: teacherSchema.id,
+        name: teacherSchema.name
+      })
+      .from(teacherSchema)
+      .where(ilike(teacherSchema.name, searchTerm))
+      .orderBy(desc(teacherSchema.name))
+      .limit(limit)
   }
 }

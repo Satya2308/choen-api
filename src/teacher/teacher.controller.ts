@@ -5,11 +5,13 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  Query
 } from "@nestjs/common"
 import { TeacherService } from "./teacher.service"
 import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
+import { SearchTeacherDto } from "./dto/search-teacher.dto"
 
 @Controller("teachers")
 export class TeacherController {
@@ -23,6 +25,11 @@ export class TeacherController {
   @Get()
   async findAll() {
     return await this.teacherService.findAll()
+  }
+
+  @Get("search")
+  async searchTeachers(@Query() query: SearchTeacherDto) {
+    return await this.teacherService.searchTeachers(query.q, query.limit)
   }
 
   @Get(":id")

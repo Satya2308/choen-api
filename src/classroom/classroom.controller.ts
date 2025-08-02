@@ -35,6 +35,7 @@ export class ClassroomController {
     @Param("id") id: string,
     @Body() updateClassroomDto: UpdateClassroomDto
   ) {
+    console.log("updateClassroomDto", updateClassroomDto)
     return await this.classroomService.update(+id, updateClassroomDto)
   }
 
