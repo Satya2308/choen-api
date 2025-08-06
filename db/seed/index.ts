@@ -2,6 +2,7 @@ import * as dotenv from "dotenv"
 import { drizzle } from "drizzle-orm/node-postgres"
 import pg from "pg"
 import { seedTimeslots } from "./timeslot"
+import seedSuperAdmin from "./admin"
 
 const { Pool } = pg
 
@@ -17,7 +18,8 @@ export function getConnection() {
 const main = async () => {
   const client = getConnection()
   const db = drizzle(client)
-  await seedTimeslots(db)
+  await seedSuperAdmin(db)
+  // await seedTimeslots(db)
 }
 
 main()

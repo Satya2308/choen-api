@@ -3,15 +3,30 @@ import {
   Post,
   Body,
   UnauthorizedException,
-  Res
+  Res,
+  UseGuards,
+  Get,
+  Req
 } from "@nestjs/common"
 import { AuthService } from "./auth.service"
 import { LoginDto } from "./dto/login.dto"
-import { Response } from "express"
+import { Request, Response } from "express"
+import { AuthGuard } from "@nestjs/passport"
+import { ConfigService } from "@nestjs/config"
 
 @Controller("auth")
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private readonly configService: ConfigService
+  ) {}
+
+  @UseGuards(AuthGuard("jwt"))
+  @Get("me")
+  getMe(@Req() req: Request) {
+    console.log("ok")
+    return req.user
+  }
 
   @Post("login")
   async login(
@@ -19,16 +34,24 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const user = await this.authService.validateUser(dto)
-    if (!user) throw new UnauthorizedException("Invalid credentials")
+    const errorMsg = "លេខទូរស័ព្ទឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។"
+    if (!user) throw new UnauthorizedException(errorMsg)
     const { accessToken, refreshToken } = await this.authService.login(user)
+    const isProd = this.configService.get("NODE_ENV") === "production"
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+      path: "/"
+    })
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      path: "/auth/refresh",
-      maxAge: 7 * 24 * 60 * 60 * 1000
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/auth/refresh"
     })
-
-    return { accessToken }
+    return { message: "Login successful" }
   }
 }
