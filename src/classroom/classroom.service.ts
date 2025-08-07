@@ -81,10 +81,11 @@ export class ClassroomService {
 
   async remove(id: number) {
     const classroomSchema = schema.classroom
-    return await this.db
+    await this.db
       .delete(classroomSchema)
       .where(eq(classroomSchema.id, id))
       .returning()
       .then(res => res[0])
+    return { message: "ទិន្នន័យថ្នាក់ត្រូវបានលុបដោយជោគជ័យ" }
   }
 }

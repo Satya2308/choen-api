@@ -67,17 +67,31 @@ export class TeacherService {
         .where(eq(userSchema.id, userId))
         .returning()
     }
-    await this.db
-      .update(teacherSchema)
-      .set(data)
-      .where(eq(teacherSchema.id, id))
+    if (Object.keys(data).length !== 0) {
+      await this.db
+        .update(teacherSchema)
+        .set(data)
+        .where(eq(teacherSchema.id, id))
+    }
     return { message: "ទិន្នន័យគ្រូត្រូវបានផ្លាស់ប្តូរដោយជោគជ័យ" }
   }
 
   async remove(id: number) {
     const teacherSchema = schema.teacher
-    await this.db.delete(teacherSchema).where(eq(teacherSchema.id, id))
-    return { message: "គ្រូបានលុបដោយជោគជ័យ" }
+    const userSchema = schema.user
+    const result = await this.db.transaction(async tx => {
+      const res = await tx
+        .delete(teacherSchema)
+        .where(eq(teacherSchema.id, id))
+        .returning()
+      if (!res[0].userId) return { message: "រកគ្រូមិនឃើញគ្រូនៅក្នុងទិន្នន័យ" }
+      await tx
+        .delete(userSchema)
+        .where(eq(userSchema.id, res[0].userId))
+        .returning()
+      return { message: "គ្រូបានលុបដោយជោគជ័យ" }
+    })
+    return result
   }
 
   async searchTeachers(query: string, limit: number = 20) {
