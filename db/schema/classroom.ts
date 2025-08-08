@@ -1,4 +1,11 @@
-import { integer, pgTable, serial, text, timestamp } from "drizzle-orm/pg-core"
+import {
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  unique
+} from "drizzle-orm/pg-core"
 import { timeslot, year } from "./year"
 import { teacher } from "./teacher"
 import { relations } from "drizzle-orm"
@@ -32,29 +39,35 @@ export const classesRelations = relations(classroom, ({ one, many }) => ({
   assignments: many(classAssignment)
 }))
 
-export const classAssignment = pgTable("classAssignment", {
-  id: serial("id").primaryKey(),
-  classroomId: integer("classroomId")
-    .references(() => classroom.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade"
-    })
-    .notNull(),
-  teacherId: integer("teacherId")
-    .references(() => teacher.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade"
-    })
-    .notNull(),
-  timeslotId: integer("timeslotId")
-    .references(() => timeslot.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade"
-    })
-    .notNull(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
-  updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
-})
+export const classAssignment = pgTable(
+  "classAssignment",
+  {
+    id: serial("id").primaryKey(),
+    classroomId: integer("classroomId")
+      .references(() => classroom.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade"
+      })
+      .notNull(),
+    teacherId: integer("teacherId")
+      .references(() => teacher.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade"
+      })
+      .notNull(),
+    timeslotId: integer("timeslotId")
+      .references(() => timeslot.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade"
+      })
+      .notNull(),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
+  },
+  table => ({
+    classroomTimeslotUnique: unique().on(table.classroomId, table.timeslotId)
+  })
+)
 
 export const classAssignmentsRelations = relations(
   classAssignment,

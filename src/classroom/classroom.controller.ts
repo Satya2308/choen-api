@@ -10,6 +10,7 @@ import {
 import { ClassroomService } from "./classroom.service"
 import { CreateClassroomDto } from "./dto/create-classroom.dto"
 import { UpdateClassroomDto } from "./dto/update-classroom.dto"
+import { AssignTeacherDto } from "./dto/assign-teacher.dto"
 
 @Controller("years/:yearId/classrooms")
 export class ClassroomController {
@@ -20,9 +21,22 @@ export class ClassroomController {
     return await this.classroomService.create(createClassroomDto)
   }
 
+  @Post(":id/assign-teacher")
+  async assignTeacher(
+    @Param("id") id: string,
+    @Body() assignTeacherDto: AssignTeacherDto
+  ) {
+    return await this.classroomService.assignTeacher(+id, assignTeacherDto)
+  }
+
   @Get()
   async findAll(@Param("yearId") yearId: string) {
     return await this.classroomService.findAll(+yearId)
+  }
+
+  @Get(":id/timeslots")
+  async findTimeslots(@Param("id") id: string) {
+    return await this.classroomService.findTimeslots(+id)
   }
 
   @Get(":id")

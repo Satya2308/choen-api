@@ -1,0 +1,1 @@
+ALTER TABLE "classAssignment" ADD CONSTRAINT "classAssignment_classroomId_timeslotId_unique" UNIQUE("classroomId","timeslotId");
