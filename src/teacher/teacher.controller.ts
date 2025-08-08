@@ -6,13 +6,16 @@ import {
   Patch,
   Param,
   Delete,
-  Query
+  Query,
+  UseGuards
 } from "@nestjs/common"
 import { TeacherService } from "./teacher.service"
 import { CreateTeacherDto } from "./dto/create-teacher.dto"
 import { UpdateTeacherDto } from "./dto/update-teacher.dto"
 import { SearchTeacherDto } from "./dto/search-teacher.dto"
+import { AuthGuard } from "@nestjs/passport"
 
+@UseGuards(AuthGuard("jwt"))
 @Controller("teachers")
 export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}

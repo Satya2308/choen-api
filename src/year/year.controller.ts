@@ -5,12 +5,15 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  UseGuards
 } from "@nestjs/common"
 import { YearService } from "./year.service"
 import { CreateYearDto } from "./dto/create-year.dto"
 import { UpdateYearDto } from "./dto/update-year.dto"
+import { AuthGuard } from "@nestjs/passport"
 
+@UseGuards(AuthGuard("jwt"))
 @Controller("years")
 export class YearController {
   constructor(private readonly yearService: YearService) {}

@@ -5,13 +5,16 @@ import {
   Body,
   Patch,
   Param,
-  Delete
+  Delete,
+  UseGuards
 } from "@nestjs/common"
 import { ClassroomService } from "./classroom.service"
 import { CreateClassroomDto } from "./dto/create-classroom.dto"
 import { UpdateClassroomDto } from "./dto/update-classroom.dto"
 import { AssignTeacherDto } from "./dto/assign-teacher.dto"
+import { AuthGuard } from "@nestjs/passport"
 
+@UseGuards(AuthGuard("jwt"))
 @Controller("years/:yearId/classrooms")
 export class ClassroomController {
   constructor(private readonly classroomService: ClassroomService) {}

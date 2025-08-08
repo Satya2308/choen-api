@@ -1,9 +1,243 @@
 {
-  "id": "1f2c7f53-9ae5-4f8e-9741-408c57d12067",
+  "id": "3fba2baa-c08a-4de7-b63c-61ecb140c24a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.classAssignment": {
+      "name": "classAssignment",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "classroomId": {
+          "name": "classroomId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "teacherId": {
+          "name": "teacherId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timeslotId": {
+          "name": "timeslotId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "classAssignment_classroomId_classroom_id_fk": {
+          "name": "classAssignment_classroomId_classroom_id_fk",
+          "tableFrom": "classAssignment",
+          "tableTo": "classroom",
+          "columnsFrom": [
+            "classroomId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "classAssignment_teacherId_teacher_id_fk": {
+          "name": "classAssignment_teacherId_teacher_id_fk",
+          "tableFrom": "classAssignment",
+          "tableTo": "teacher",
+          "columnsFrom": [
+            "teacherId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "classAssignment_timeslotId_timeslot_id_fk": {
+          "name": "classAssignment_timeslotId_timeslot_id_fk",
+          "tableFrom": "classAssignment",
+          "tableTo": "timeslot",
+          "columnsFrom": [
+            "timeslotId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "classAssignment_classroomId_timeslotId_unique": {
+          "name": "classAssignment_classroomId_timeslotId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "classroomId",
+            "timeslotId"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.classroom": {
+      "name": "classroom",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "yearId": {
+          "name": "yearId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "leadTeacherId": {
+          "name": "leadTeacherId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "classroom_yearId_year_id_fk": {
+          "name": "classroom_yearId_year_id_fk",
+          "tableFrom": "classroom",
+          "tableTo": "year",
+          "columnsFrom": [
+            "yearId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "classroom_leadTeacherId_teacher_id_fk": {
+          "name": "classroom_leadTeacherId_teacher_id_fk",
+          "tableFrom": "classroom",
+          "tableTo": "teacher",
+          "columnsFrom": [
+            "leadTeacherId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refreshToken": {
+          "name": "refreshToken",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_phone_unique": {
+          "name": "user_phone_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phone"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.teacher": {
       "name": "teacher",
       "schema": "",
@@ -45,14 +279,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "class": {
-          "name": "class",
+        "profession": {
+          "name": "profession",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "profession": {
-          "name": "profession",
+        "profession1": {
+          "name": "profession1",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -65,8 +299,7 @@
         },
         "rank": {
           "name": "rank",
-          "type": "rank",
-          "typeSchema": "public",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -120,8 +353,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
-      "name": "user",
+    "public.timeslot": {
+      "name": "timeslot",
       "schema": "",
       "columns": {
         "id": {
@@ -130,15 +363,22 @@
           "primaryKey": true,
           "notNull": true
         },
-        "phone": {
-          "name": "phone",
+        "label": {
+          "name": "label",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "password": {
-          "name": "password",
-          "type": "text",
+        "duration": {
+          "name": "duration",
+          "type": "classDuration",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sortOrder": {
+          "name": "sortOrder",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -159,15 +399,59 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "user_phone_unique": {
-          "name": "user_phone_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "phone"
-          ]
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.year": {
+      "name": "year",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "classDuration": {
+          "name": "classDuration",
+          "type": "classDuration",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -182,47 +466,12 @@
         "FEMALE"
       ]
     },
-    "public.rank": {
-      "name": "rank",
+    "public.classDuration": {
+      "name": "classDuration",
       "schema": "public",
       "values": [
-        "ក.1.1",
-        "ក.1.2",
-        "ក.1.3",
-        "ក.1.4",
-        "ក.1.5",
-        "ក.1.6",
-        "ក.2.1",
-        "ក.2.2",
-        "ក.2.3",
-        "ក.2.4",
-        "ក.3.1",
-        "ក.3.2",
-        "ក.3.3",
-        "ក.3.4",
-        "ខ.1.1",
-        "ខ.1.2",
-        "ខ.1.3",
-        "ខ.1.4",
-        "ខ.1.5",
-        "ខ.1.6",
-        "ខ.2.1",
-        "ខ.2.2",
-        "ខ.2.3",
-        "ខ.2.4",
-        "ខ.3.1",
-        "ខ.3.2",
-        "ខ.3.3",
-        "ខ.3.4",
-        "គ.1",
-        "គ.2",
-        "គ.3",
-        "គ.4",
-        "គ.5",
-        "គ.6",
-        "គ.7",
-        "គ.8",
-        "គ.9"
+        "1_hour",
+        "1_5_hour"
       ]
     }
   },
