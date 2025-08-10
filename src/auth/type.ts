@@ -9,6 +9,9 @@ export type UserInput = InferInsertModel<typeof schema.user>
 
 export type ValidateUserInput = { phone: string; password: string }
 
-export type AccessToken = Pick<User, "id" | "phone">
+export type AccessToken = { sub: number; phone: string }
 
-export type RefreshToken = { sub: number; phone: string }
+export type RefreshToken = {
+  sub: number
+  phone: string
+}

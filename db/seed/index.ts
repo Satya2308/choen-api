@@ -18,7 +18,7 @@ export function getConnection() {
 const main = async () => {
   const client = getConnection()
   const db = drizzle(client)
-  // await seedSuperAdmin(db)
+  await seedSuperAdmin(db)
   await seedTimeslots(db)
 }
 

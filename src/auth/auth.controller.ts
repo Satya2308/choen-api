@@ -27,6 +27,38 @@ export class AuthController {
     return req.user
   }
 
+  @UseGuards(AuthGuard("jwt-refresh"))
+  @Post("refresh")
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    console.log("refresh")
+    const currentRefreshToken = req.cookies?.refreshToken
+    const userId = req.user?.["userId"]
+    const service = this.authService
+    const { accessToken, refreshToken } = await service.refreshTokens(
+      userId,
+      currentRefreshToken
+    )
+    const isProd = this.configService.get("NODE_ENV") === "production"
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 15 * 60 * 1000,
+      path: "/"
+    })
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: "/"
+    })
+    return { success: true }
+  }
+
   @Post("login")
   async login(
     @Body() dto: LoginDto,
@@ -49,8 +81,31 @@ export class AuthController {
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: "/auth/refresh"
+      path: "/"
     })
     return { message: "Login successful" }
+  }
+
+  @UseGuards(AuthGuard("jwt"))
+  @Post("logout")
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const userId = req.user?.["userId"]
+    await this.authService.clearRefreshToken(userId)
+    const isProd = this.configService.get("NODE_ENV") === "production"
+    res.cookie("accessToken", "", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      expires: new Date(0),
+      path: "/"
+    })
+    res.cookie("refreshToken", "", {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      expires: new Date(0),
+      path: "/"
+    })
+    return { message: "Logged out successfully" }
   }
 }
