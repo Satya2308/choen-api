@@ -101,11 +101,11 @@ export class TeacherService {
     return await this.db
       .select({
         id: teacherSchema.id,
-        name: teacherSchema.name
+        code: teacherSchema.code
       })
       .from(teacherSchema)
-      .where(ilike(teacherSchema.name, searchTerm))
-      .orderBy(desc(teacherSchema.name))
+      .where(ilike(teacherSchema.code, searchTerm))
+      .orderBy(desc(teacherSchema.code))
       .limit(limit)
   }
 
@@ -114,10 +114,10 @@ export class TeacherService {
     return await this.db
       .select({
         id: teacherSchema.id,
-        name: teacherSchema.name
+        code: teacherSchema.code
       })
       .from(teacherSchema)
-      .orderBy(desc(teacherSchema.name))
+      .orderBy(desc(teacherSchema.code))
       .limit(20)
   }
 }
