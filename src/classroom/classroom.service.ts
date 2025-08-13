@@ -5,6 +5,7 @@ import * as schema from "db/schema"
 import { Database } from "db/type"
 import { and, eq, sql } from "drizzle-orm"
 import { AssignTeacherDto } from "./dto/assign-teacher.dto"
+import { TimeslotWithAssignments } from "./type"
 
 @Injectable()
 export class ClassroomService {
@@ -19,7 +20,7 @@ export class ClassroomService {
   }
 
   async assignTeacher(classroomId: number, assignTeacherDto: AssignTeacherDto) {
-    const { timeslotId, teacherId, action } = assignTeacherDto
+    const { timeslotId, teacherId, action, day } = assignTeacherDto
     const classAssignmentDb = schema.classAssignment
     if (action === "REMOVE" || !teacherId) {
       await this.db
@@ -27,16 +28,17 @@ export class ClassroomService {
         .where(
           and(
             eq(classAssignmentDb.classroomId, classroomId),
-            eq(classAssignmentDb.timeslotId, timeslotId)
+            eq(classAssignmentDb.timeslotId, timeslotId),
+            eq(classAssignmentDb.day, day)
           )
         )
       return { message: "Assignment removed" }
     }
     await this.db
       .insert(classAssignmentDb)
-      .values({ classroomId, timeslotId, teacherId })
+      .values({ classroomId, timeslotId, teacherId, day })
       .onConflictDoUpdate({
-        target: [classAssignmentDb.classroomId, classAssignmentDb.timeslotId],
+        target: [classAssignmentDb.classroomId, classAssignmentDb.timeslotId, classAssignmentDb.day],
         set: { teacherId, updatedAt: new Date() }
       })
     return { message: "Teacher assigned successfully" }
@@ -45,27 +47,11 @@ export class ClassroomService {
   async findAll(yearId: number) {
     const classroomSchema = schema.classroom
     const teacherSchema = schema.teacher
-    const timeslotSchema = schema.timeslot
-    const yearSchema = schema.year
-    const classAssignmentSchema = schema.classAssignment
     return await this.db
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { id: teacherSchema.id, name: teacherSchema.name },
-        assignedTimeslots: sql<number>`(
-          SELECT COUNT(*) 
-          FROM ${classAssignmentSchema} 
-          WHERE ${classAssignmentSchema.classroomId} = ${classroomSchema.id}
-        )`,
-        totalTimeslots: sql<number>`(
-          SELECT COUNT(*) FROM ${timeslotSchema} 
-          WHERE ${timeslotSchema.duration} = (
-            SELECT ${yearSchema.classDuration} 
-            FROM ${yearSchema} 
-            WHERE ${yearSchema.id} = ${yearId}
-         )
-        )`
+        teacher: { id: teacherSchema.id, name: teacherSchema.name }
       })
       .from(classroomSchema)
       .leftJoin(
@@ -114,42 +100,87 @@ export class ClassroomService {
     return { message: "ទិន្នន័យថ្នាក់ត្រូវបានលុបដោយជោគជ័យ" }
   }
 
-  async findTimeslots(classroomId: number) {
+  async getDuration(classroomId: number) {
     const classroomDb = schema.classroom
     const yearDb = schema.year
-    const timeslotDb = schema.timeslot
-    const teacherDb = schema.teacher
-    const classAssignmentDb = schema.classAssignment
-    const duration = await this.db
+    return this.db
       .select({ classDuration: yearDb.classDuration })
       .from(classroomDb)
-      .innerJoin(yearDb, eq(classroomDb.yearId, yearDb.id))
+      .innerJoin(yearDb, eq(yearDb.id, classroomDb.yearId))
       .where(eq(classroomDb.id, classroomId))
       .limit(1)
       .then(res => res[0])
+  }
+
+  async findTimetable(classroomId: number): Promise<TimeslotWithAssignments[]> {
+    const duration = await this.getDuration(classroomId)
     if (!duration) throw new Error("Classroom not found")
-    const timeslots = await this.db
-      .select({
-        id: timeslotDb.id,
-        label: timeslotDb.label,
-        duration: timeslotDb.duration,
-        sortOrder: timeslotDb.sortOrder,
-        teacher: {
-          id: teacherDb.id,
-          name: teacherDb.name
-        }
-      })
-      .from(timeslotDb)
-      .leftJoin(
-        classAssignmentDb,
-        and(
-          eq(classAssignmentDb.classroomId, classroomId),
-          eq(classAssignmentDb.timeslotId, timeslotDb.id)
+    const result = await this.db.execute(sql<TimeslotWithAssignments[]>`
+    SELECT 
+      ts.id,
+      ts.label,
+      ts.duration,
+      ts."sortOrder" AS "sortOrder",
+      json_build_object(
+        'monday', json_build_object('teacher', 
+          CASE WHEN ca_mon."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_mon."teacherId", 'name', t_mon.name) 
+          ELSE null END
+        ),
+        'tuesday', json_build_object('teacher', 
+          CASE WHEN ca_tue."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_tue."teacherId", 'name', t_tue.name) 
+          ELSE null END
+        ),
+        'wednesday', json_build_object('teacher', 
+          CASE WHEN ca_wed."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_wed."teacherId", 'name', t_wed.name) 
+          ELSE null END
+        ),
+        'thursday', json_build_object('teacher', 
+          CASE WHEN ca_thu."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_thu."teacherId", 'name', t_thu.name) 
+          ELSE null END
+        ),
+        'friday', json_build_object('teacher', 
+          CASE WHEN ca_fri."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_fri."teacherId", 'name', t_fri.name) 
+          ELSE null END
+        ),
+        'saturday', json_build_object('teacher', 
+          CASE WHEN ca_sat."teacherId" IS NOT NULL 
+          THEN json_build_object('id', ca_sat."teacherId", 'name', t_sat.name) 
+          ELSE null END
         )
-      )
-      .leftJoin(teacherDb, eq(teacherDb.id, classAssignmentDb.teacherId))
-      .where(eq(timeslotDb.duration, duration.classDuration))
-      .orderBy(timeslotDb.sortOrder)
-    return timeslots
+      )::jsonb AS assignments
+    FROM timeslot ts
+    LEFT JOIN "classAssignment" ca_mon ON ca_mon."timeslotId" = ts.id 
+      AND ca_mon."classroomId" = ${classroomId} 
+      AND ca_mon.day = 'monday'
+    LEFT JOIN teacher t_mon ON t_mon.id = ca_mon."teacherId"
+    LEFT JOIN "classAssignment" ca_tue ON ca_tue."timeslotId" = ts.id 
+      AND ca_tue."classroomId" = ${classroomId} 
+      AND ca_tue.day = 'tuesday'
+    LEFT JOIN teacher t_tue ON t_tue.id = ca_tue."teacherId"
+    LEFT JOIN "classAssignment" ca_wed ON ca_wed."timeslotId" = ts.id 
+      AND ca_wed."classroomId" = ${classroomId} 
+      AND ca_wed.day = 'wednesday'
+    LEFT JOIN teacher t_wed ON t_wed.id = ca_wed."teacherId"
+    LEFT JOIN "classAssignment" ca_thu ON ca_thu."timeslotId" = ts.id 
+      AND ca_thu."classroomId" = ${classroomId} 
+      AND ca_thu.day = 'thursday'
+    LEFT JOIN teacher t_thu ON t_thu.id = ca_thu."teacherId"
+    LEFT JOIN "classAssignment" ca_fri ON ca_fri."timeslotId" = ts.id 
+      AND ca_fri."classroomId" = ${classroomId} 
+      AND ca_fri.day = 'friday'
+    LEFT JOIN teacher t_fri ON t_fri.id = ca_fri."teacherId"
+    LEFT JOIN "classAssignment" ca_sat ON ca_sat."timeslotId" = ts.id 
+      AND ca_sat."classroomId" = ${classroomId} 
+      AND ca_sat.day = 'saturday'
+    LEFT JOIN teacher t_sat ON t_sat.id = ca_sat."teacherId"
+    WHERE ts.duration = ${duration.classDuration}
+    ORDER BY ts."sortOrder"
+  `)
+    return result.rows
   }
 }

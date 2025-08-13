@@ -1,5 +1,6 @@
 import {
   integer,
+  pgEnum,
   pgTable,
   serial,
   text,
@@ -39,6 +40,15 @@ export const classesRelations = relations(classroom, ({ one, many }) => ({
   assignments: many(classAssignment)
 }))
 
+export const dayEnum = pgEnum("day", [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday"
+])
+
 export const classAssignment = pgTable(
   "classAssignment",
   {
@@ -61,11 +71,16 @@ export const classAssignment = pgTable(
         onUpdate: "cascade"
       })
       .notNull(),
+    day: dayEnum("day").notNull(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
   },
   table => ({
-    classroomTimeslotUnique: unique().on(table.classroomId, table.timeslotId)
+    classroomDayTimeslotUnique: unique().on(
+      table.classroomId,
+      table.day,
+      table.timeslotId
+    )
   })
 )
 

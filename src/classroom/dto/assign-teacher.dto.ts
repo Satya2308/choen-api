@@ -5,12 +5,24 @@ export enum ACTION {
   REMOVE = "REMOVE"
 }
 
+export enum DAY {
+  MONDAY = "monday",
+  TUESDAY = "tuesday",
+  WEDNESDAY = "wednesday",
+  THURSDAY = "thursday",
+  FRIDAY = "friday",
+  SATURDAY = "saturday"
+}
+
 export class AssignTeacherDto {
   @IsNumber()
   timeslotId: number
 
   @IsNumber()
   classroomId: number
+
+  @IsIn([DAY.MONDAY, DAY.TUESDAY, DAY.WEDNESDAY, DAY.THURSDAY, DAY.FRIDAY, DAY.SATURDAY])
+  day: DAY
 
   @IsOptional()
   @IsNumber()

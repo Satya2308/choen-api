@@ -37,9 +37,9 @@ export class ClassroomController {
     return await this.classroomService.findAll(+yearId)
   }
 
-  @Get(":id/timeslots")
-  async findTimeslots(@Param("id") id: string) {
-    return await this.classroomService.findTimeslots(+id)
+  @Get(":id/timetable")
+  async findTimetable(@Param("id") id: string) {
+    return await this.classroomService.findTimetable(+id)
   }
 
   @Get(":id")
