@@ -101,6 +101,7 @@ export class TeacherService {
     return await this.db
       .select({
         id: teacherSchema.id,
+        name: teacherSchema.name,
         code: teacherSchema.code
       })
       .from(teacherSchema)
@@ -114,6 +115,7 @@ export class TeacherService {
     return await this.db
       .select({
         id: teacherSchema.id,
+        name: teacherSchema.name,
         code: teacherSchema.code
       })
       .from(teacherSchema)

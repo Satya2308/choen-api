@@ -4,11 +4,11 @@ export interface TimeslotWithAssignments {
   duration: string
   sortOrder: number
   assignments: {
-    monday: { teacher: { id: number; code: string } | null }
-    tuesday: { teacher: { id: number; code: string } | null }
-    wednesday: { teacher: { id: number; code: string } | null }
-    thursday: { teacher: { id: number; code: string } | null }
-    friday: { teacher: { id: number; code: string } | null }
-    saturday: { teacher: { id: number; code: string } | null }
+    monday: { teacher: { id: number; name: string, code: string } | null }
+    tuesday: { teacher: { id: number; name: string, code: string } | null }
+    wednesday: { teacher: { id: number; name: string, code: string } | null }
+    thursday: { teacher: { id: number; name: string, code: string } | null }
+    friday: { teacher: { id: number; name: string, code: string } | null }
+    saturday: { teacher: { id: number; name: string, code: string } | null }
   }
 }

@@ -51,7 +51,7 @@ export class ClassroomService {
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { id: teacherSchema.id, code: teacherSchema.code }
+        teacher: { id: teacherSchema.id, name: schema.teacher.name, code: teacherSchema.code }
       })
       .from(classroomSchema)
       .leftJoin(
@@ -68,7 +68,7 @@ export class ClassroomService {
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { id: teacherSchema.id, code: schema.teacher.code }
+        teacher: { id: teacherSchema.id, name: schema.teacher.name, code: schema.teacher.code }
       })
       .from(classroomSchema)
       .leftJoin(
@@ -124,32 +124,32 @@ export class ClassroomService {
       json_build_object(
         'monday', json_build_object('teacher', 
           CASE WHEN ca_mon."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_mon."teacherId", 'code', t_mon.code) 
+          THEN json_build_object('id', ca_mon."teacherId", 'name', t_mon.name, 'code', t_mon.code) 
           ELSE null END
         ),
         'tuesday', json_build_object('teacher', 
           CASE WHEN ca_tue."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_tue."teacherId", 'code', t_tue.code) 
+          THEN json_build_object('id', ca_tue."teacherId", 'name', t_tue.name, 'code', t_tue.code) 
           ELSE null END
         ),
         'wednesday', json_build_object('teacher', 
           CASE WHEN ca_wed."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_wed."teacherId", 'code', t_wed.code) 
+          THEN json_build_object('id', ca_wed."teacherId", 'name', t_wed.name, 'code', t_wed.code) 
           ELSE null END
         ),
         'thursday', json_build_object('teacher', 
           CASE WHEN ca_thu."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_thu."teacherId", 'code', t_thu.code) 
+          THEN json_build_object('id', ca_thu."teacherId", 'name', t_thu.name, 'code', t_thu.code) 
           ELSE null END
         ),
         'friday', json_build_object('teacher', 
           CASE WHEN ca_fri."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_fri."teacherId", 'code', t_fri.code) 
+          THEN json_build_object('id', ca_fri."teacherId", 'name', t_fri.name, 'code', t_fri.code) 
           ELSE null END
         ),
         'saturday', json_build_object('teacher', 
           CASE WHEN ca_sat."teacherId" IS NOT NULL 
-          THEN json_build_object('id', ca_sat."teacherId", 'code', t_sat.code) 
+          THEN json_build_object('id', ca_sat."teacherId", 'name', t_sat.name, 'code', t_sat.code) 
           ELSE null END
         )
       )::jsonb AS assignments
