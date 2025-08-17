@@ -19,8 +19,6 @@ export class AuthService {
 
   async validateUser(props: ValidateUserInput) {
     const { phone, password } = props
-    console.log("phone", phone)
-    console.log("password", password)
     const user = await this.usersService.getByPhone(phone)
     if (user && (await bcrypt.compare(password, user.password!))) {
       const { password, ...result } = user

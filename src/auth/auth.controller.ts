@@ -33,7 +33,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response
   ) {
-    console.log("refresh")
     const currentRefreshToken = req.cookies?.refreshToken
     const userId = req.user?.["userId"]
     const service = this.authService
