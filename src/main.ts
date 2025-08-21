@@ -7,15 +7,16 @@ import cookieParser from "cookie-parser"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
-const origin =
-  process.env.NODE_ENV === "production"
-    ? "https://bkkschool.site"
-    : "http://localhost:5173"
+  const origin =
+    process.env.NODE_ENV === "production"
+      ? "https://bkkschool.site"
+      : "http://localhost:5173"
 
-app.enableCors({
-  origin,
-  credentials: true
-})
+  app.enableCors({
+    origin,
+    credentials: true
+  })
+
   app.use(cookieParser())
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
