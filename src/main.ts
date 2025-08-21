@@ -7,11 +7,15 @@ import cookieParser from "cookie-parser"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
-  app.enableCors({
-    origin: "http://localhost:5173", // your Remix app
-    credentials: true
-  })
+const origin =
+  process.env.NODE_ENV === "production"
+    ? "https://bkkschool.site"
+    : "http://localhost:5173"
 
+app.enableCors({
+  origin,
+  credentials: true
+})
   app.use(cookieParser())
 
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
