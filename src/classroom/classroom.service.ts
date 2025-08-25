@@ -38,7 +38,11 @@ export class ClassroomService {
       .insert(classAssignmentDb)
       .values({ classroomId, timeslotId, teacherId, day })
       .onConflictDoUpdate({
-        target: [classAssignmentDb.classroomId, classAssignmentDb.timeslotId, classAssignmentDb.day],
+        target: [
+          classAssignmentDb.classroomId,
+          classAssignmentDb.timeslotId,
+          classAssignmentDb.day
+        ],
         set: { teacherId, updatedAt: new Date() }
       })
     return { message: "Teacher assigned successfully" }
@@ -51,7 +55,11 @@ export class ClassroomService {
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { id: teacherSchema.id, name: schema.teacher.name, code: teacherSchema.code }
+        teacher: {
+          id: teacherSchema.id,
+          name: schema.teacher.name,
+          code: teacherSchema.code
+        }
       })
       .from(classroomSchema)
       .leftJoin(
@@ -68,7 +76,11 @@ export class ClassroomService {
       .select({
         id: classroomSchema.id,
         name: classroomSchema.name,
-        teacher: { id: teacherSchema.id, name: schema.teacher.name, code: schema.teacher.code }
+        teacher: {
+          id: teacherSchema.id,
+          name: schema.teacher.name,
+          code: schema.teacher.code
+        }
       })
       .from(classroomSchema)
       .leftJoin(
