@@ -65,7 +65,12 @@ export class AuthController {
   ) {
     const user = await this.authService.validateUser(dto)
     const errorMsg = "លេខទូរស័ព្ទឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។"
-    if (!user) throw new UnauthorizedException(errorMsg)
+    if (!user)
+      throw new UnauthorizedException({
+        statusCode: 401,
+        message: errorMsg,
+        error: "Unauthorized"
+      })
     const { accessToken, refreshToken } = await this.authService.login(user)
     const isProd = this.configService.get("NODE_ENV") === "production"
     res.cookie("accessToken", accessToken, {
