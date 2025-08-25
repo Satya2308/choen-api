@@ -64,7 +64,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const user = await this.authService.validateUser(dto)
-    const errorMsg = "លេខទូរស័ព្ទឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ។"
+    const errorMsg = "លេខទូរស័ព្ទឬពាក្យសម្ងាត់មិនត្រឹមត្រូវទេ"
     if (!user)
       throw new UnauthorizedException({
         statusCode: 401,
