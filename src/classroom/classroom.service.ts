@@ -202,7 +202,11 @@ export class ClassroomService {
     return await this.db
       .select({
         name: classroomDb.name,
-        year: { name: yearDb.name }
+        year: {
+          name: yearDb.name,
+          startDateKh: yearDb.startDateKh,
+          startDateEng: yearDb.startDateEng
+        }
       })
       .from(classroomDb)
       .innerJoin(yearDb, eq(yearDb.id, classroomDb.yearId))
@@ -648,6 +652,43 @@ export class ClassroomService {
         }
       ]
     }
+
+    worksheet.mergeCells(`F${footerRow + 4}:H${footerRow + 4}`)
+    const f17 = worksheet.getCell(`F${footerRow + 4}`)
+    f17.value = classroomInfo.year.startDateKh
+    f17.font = {
+      name: "Khmer OS",
+      size: 12
+    }
+    f17.alignment = { horizontal: "center", vertical: "middle" }
+
+    worksheet.mergeCells(`F${footerRow + 5}:H${footerRow + 5}`)
+    const f18 = worksheet.getCell(`F${footerRow + 5}`)
+    f18.value = classroomInfo.year.startDateEng
+    f18.font = {
+      name: "Khmer OS",
+      size: 12
+    }
+    f18.alignment = { horizontal: "center", vertical: "middle" }
+
+    worksheet.mergeCells(`B${footerRow + 6}:D${footerRow + 6}`)
+    const f19 = worksheet.getCell(`B${footerRow + 6}`)
+    f19.value = "សូមរក្សាសិទ្ធក្នុងការកែប្រែពេលមានការចាំបាច់"
+    f19.font = {
+      name: "Khmer OS",
+      size: 10
+    }
+    f19.alignment = { vertical: "middle" }
+
+    worksheet.mergeCells(`F${footerRow + 6}:H${footerRow + 6}`)
+    const f20 = worksheet.getCell(`F${footerRow + 6}`)
+    f20.value = "នាយកវិទ្យាល័យ"
+    f20.font = {
+      name: "Khmer OS Muol Light",
+      bold: true,
+      size: 12
+    }
+    f20.alignment = { horizontal: "center", vertical: "middle" }
 
     // Generate buffer
     const buffer = await workbook.xlsx.writeBuffer()
