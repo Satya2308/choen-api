@@ -1,3 +1,4 @@
+CREATE TYPE "public"."day" AS ENUM('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday');--> statement-breakpoint
 CREATE TYPE "public"."gender" AS ENUM('MALE', 'FEMALE');--> statement-breakpoint
 CREATE TYPE "public"."classDuration" AS ENUM('1_hour', '1_5_hour');--> statement-breakpoint
 CREATE TABLE "classAssignment" (
@@ -5,9 +6,10 @@ CREATE TABLE "classAssignment" (
 	"classroomId" integer NOT NULL,
 	"teacherId" integer NOT NULL,
 	"timeslotId" integer NOT NULL,
+	"day" "day" NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp,
-	CONSTRAINT "classAssignment_classroomId_timeslotId_unique" UNIQUE("classroomId","timeslotId")
+	CONSTRAINT "classAssignment_classroomId_day_timeslotId_unique" UNIQUE("classroomId","day","timeslotId")
 );
 --> statement-breakpoint
 CREATE TABLE "classroom" (
@@ -36,8 +38,8 @@ CREATE TABLE "teacher" (
 	"gender" "gender",
 	"dob" date,
 	"subject" text,
-	"profession" text,
 	"profession1" text,
+	"profession2" text,
 	"krobkan" text,
 	"rank" text,
 	"userId" integer,
@@ -60,6 +62,8 @@ CREATE TABLE "year" (
 	"name" text NOT NULL,
 	"classDuration" "classDuration" NOT NULL,
 	"isActive" boolean DEFAULT true NOT NULL,
+	"startDateKh" text NOT NULL,
+	"startDateEng" text NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp
 );

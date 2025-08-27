@@ -17,6 +17,8 @@ export const year = pgTable("year", {
   name: text("name").notNull(),
   classDuration: classDurationEnum("classDuration").notNull(),
   isActive: boolean("isActive").default(true).notNull(),
+  startDateKh: text("startDateKh").notNull(),
+  startDateEng: text("startDateEng").notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
 })

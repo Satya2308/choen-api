@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  Res
 } from "@nestjs/common"
 import { ClassroomService } from "./classroom.service"
 import { CreateClassroomDto } from "./dto/create-classroom.dto"
 import { UpdateClassroomDto } from "./dto/update-classroom.dto"
 import { AssignTeacherDto } from "./dto/assign-teacher.dto"
 import { AuthGuard } from "@nestjs/passport"
+import { Response } from "express"
 
 @UseGuards(AuthGuard("jwt"))
 @Controller("years/:yearId/classrooms")
@@ -40,6 +42,18 @@ export class ClassroomController {
   @Get(":id/timetable")
   async findTimetable(@Param("id") id: string) {
     return await this.classroomService.findTimetable(+id)
+  }
+
+  @Get(":id/export")
+  async exportTimetable(@Param("id") id: number, @Res() res: Response) {
+    const buffer = await this.classroomService.exportTimetableToExcel(id)
+    res.set({
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": "attachment",
+      "Content-Length": buffer.length
+    })
+    res.send(buffer)
   }
 
   @Get(":id")

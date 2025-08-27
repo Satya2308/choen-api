@@ -14,4 +14,10 @@ export class CreateYearDto {
 
   @IsBoolean()
   isActive: boolean = true
+
+  @IsString()
+  startDateKh: string
+
+  @IsString()
+  startDateEng: string
 }

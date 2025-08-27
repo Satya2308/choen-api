@@ -1,5 +1,5 @@
 {
-  "id": "3fba2baa-c08a-4de7-b63c-61ecb140c24a",
+  "id": "0252b318-9aec-4c12-be34-afd79ce2d64a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -29,6 +29,13 @@
         "timeslotId": {
           "name": "timeslotId",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "day",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
@@ -90,11 +97,12 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "classAssignment_classroomId_timeslotId_unique": {
-          "name": "classAssignment_classroomId_timeslotId_unique",
+        "classAssignment_classroomId_day_timeslotId_unique": {
+          "name": "classAssignment_classroomId_day_timeslotId_unique",
           "nullsNotDistinct": false,
           "columns": [
             "classroomId",
+            "day",
             "timeslotId"
           ]
         }
@@ -279,14 +287,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "profession": {
-          "name": "profession",
+        "profession1": {
+          "name": "profession1",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "profession1": {
-          "name": "profession1",
+        "profession2": {
+          "name": "profession2",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -434,6 +442,18 @@
           "notNull": true,
           "default": true
         },
+        "startDateKh": {
+          "name": "startDateKh",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startDateEng": {
+          "name": "startDateEng",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "createdAt": {
           "name": "createdAt",
           "type": "timestamp",
@@ -458,6 +478,18 @@
     }
   },
   "enums": {
+    "public.day": {
+      "name": "day",
+      "schema": "public",
+      "values": [
+        "monday",
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday"
+      ]
+    },
     "public.gender": {
       "name": "gender",
       "schema": "public",
