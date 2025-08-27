@@ -71,6 +71,12 @@ export const classAssignment = pgTable(
         onUpdate: "cascade"
       })
       .notNull(),
+    yearId: integer("yearId")
+      .references(() => year.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade"
+      })
+      .notNull(),
     day: dayEnum("day").notNull(),
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     updatedAt: timestamp("updatedAt").$onUpdateFn(() => new Date())
@@ -79,7 +85,8 @@ export const classAssignment = pgTable(
     classroomDayTimeslotUnique: unique().on(
       table.classroomId,
       table.day,
-      table.timeslotId
+      table.timeslotId,
+      table.yearId
     )
   })
 )

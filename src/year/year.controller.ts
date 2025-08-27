@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards
+  UseGuards,
+  Res
 } from "@nestjs/common"
 import { YearService } from "./year.service"
 import { CreateYearDto } from "./dto/create-year.dto"
 import { UpdateYearDto } from "./dto/update-year.dto"
 import { AuthGuard } from "@nestjs/passport"
+import { Response } from "express"
 
 @UseGuards(AuthGuard("jwt"))
 @Controller("years")
@@ -26,6 +28,22 @@ export class YearController {
   @Get()
   async findAll() {
     return await this.yearService.findAll()
+  }
+
+  @Get(":id/teachers/:tid/export")
+  async exportTimetable(
+    @Param("id") id: number,
+    @Param("tid") tid: number,
+    @Res() res: Response
+  ) {
+    const buffer = await this.yearService.exportTimetableToExcel(id)
+    res.set({
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": "attachment",
+      "Content-Length": buffer.length
+    })
+    res.send(buffer)
   }
 
   @Get(":id")
