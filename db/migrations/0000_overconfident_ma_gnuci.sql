@@ -6,10 +6,11 @@ CREATE TABLE "classAssignment" (
 	"classroomId" integer NOT NULL,
 	"teacherId" integer NOT NULL,
 	"timeslotId" integer NOT NULL,
+	"yearId" integer NOT NULL,
 	"day" "day" NOT NULL,
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"updatedAt" timestamp,
-	CONSTRAINT "classAssignment_classroomId_day_timeslotId_unique" UNIQUE("classroomId","day","timeslotId")
+	CONSTRAINT "classAssignment_classroomId_day_timeslotId_yearId_unique" UNIQUE("classroomId","day","timeslotId","yearId")
 );
 --> statement-breakpoint
 CREATE TABLE "classroom" (
@@ -71,6 +72,7 @@ CREATE TABLE "year" (
 ALTER TABLE "classAssignment" ADD CONSTRAINT "classAssignment_classroomId_classroom_id_fk" FOREIGN KEY ("classroomId") REFERENCES "public"."classroom"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "classAssignment" ADD CONSTRAINT "classAssignment_teacherId_teacher_id_fk" FOREIGN KEY ("teacherId") REFERENCES "public"."teacher"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "classAssignment" ADD CONSTRAINT "classAssignment_timeslotId_timeslot_id_fk" FOREIGN KEY ("timeslotId") REFERENCES "public"."timeslot"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "classAssignment" ADD CONSTRAINT "classAssignment_yearId_year_id_fk" FOREIGN KEY ("yearId") REFERENCES "public"."year"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "classroom" ADD CONSTRAINT "classroom_yearId_year_id_fk" FOREIGN KEY ("yearId") REFERENCES "public"."year"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "classroom" ADD CONSTRAINT "classroom_leadTeacherId_teacher_id_fk" FOREIGN KEY ("leadTeacherId") REFERENCES "public"."teacher"("id") ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "teacher" ADD CONSTRAINT "teacher_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE cascade;

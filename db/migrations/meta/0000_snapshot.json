@@ -1,5 +1,5 @@
 {
-  "id": "0252b318-9aec-4c12-be34-afd79ce2d64a",
+  "id": "0eb986e2-2219-4895-acde-9f167b83205d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -28,6 +28,12 @@
         },
         "timeslotId": {
           "name": "timeslotId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "yearId": {
+          "name": "yearId",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -93,17 +99,31 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
+        },
+        "classAssignment_yearId_year_id_fk": {
+          "name": "classAssignment_yearId_year_id_fk",
+          "tableFrom": "classAssignment",
+          "tableTo": "year",
+          "columnsFrom": [
+            "yearId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "classAssignment_classroomId_day_timeslotId_unique": {
-          "name": "classAssignment_classroomId_day_timeslotId_unique",
+        "classAssignment_classroomId_day_timeslotId_yearId_unique": {
+          "name": "classAssignment_classroomId_day_timeslotId_yearId_unique",
           "nullsNotDistinct": false,
           "columns": [
             "classroomId",
             "day",
-            "timeslotId"
+            "timeslotId",
+            "yearId"
           ]
         }
       },
