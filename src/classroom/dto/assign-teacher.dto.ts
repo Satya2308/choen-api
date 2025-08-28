@@ -21,7 +21,14 @@ export class AssignTeacherDto {
   @IsNumber()
   classroomId: number
 
-  @IsIn([DAY.MONDAY, DAY.TUESDAY, DAY.WEDNESDAY, DAY.THURSDAY, DAY.FRIDAY, DAY.SATURDAY])
+  @IsIn([
+    DAY.MONDAY,
+    DAY.TUESDAY,
+    DAY.WEDNESDAY,
+    DAY.THURSDAY,
+    DAY.FRIDAY,
+    DAY.SATURDAY
+  ])
   day: DAY
 
   @IsOptional()

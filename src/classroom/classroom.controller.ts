@@ -29,9 +29,14 @@ export class ClassroomController {
   @Post(":id/assign-teacher")
   async assignTeacher(
     @Param("id") id: string,
+    @Param("yearId") yearId: string,
     @Body() assignTeacherDto: AssignTeacherDto
   ) {
-    return await this.classroomService.assignTeacher(+id, assignTeacherDto)
+    return await this.classroomService.assignTeacher(
+      +id,
+      +yearId,
+      assignTeacherDto
+    )
   }
 
   @Get()
@@ -40,13 +45,23 @@ export class ClassroomController {
   }
 
   @Get(":id/timetable")
-  async findTimetable(@Param("id") id: string) {
-    return await this.classroomService.findTimetable(+id)
+  async findTimetable(
+    @Param("id") id: string,
+    @Param("yearId") yearId: string
+  ) {
+    return await this.classroomService.findTimetable(+id, +yearId)
   }
 
   @Get(":id/export")
-  async exportTimetable(@Param("id") id: number, @Res() res: Response) {
-    const buffer = await this.classroomService.exportTimetableToExcel(id)
+  async exportTimetable(
+    @Param("id") id: number,
+    @Param("yearId") yearId: number,
+    @Res() res: Response
+  ) {
+    const buffer = await this.classroomService.exportTimetableToExcel(
+      id,
+      yearId
+    )
     res.set({
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

@@ -36,11 +36,11 @@ export class YearController {
     @Param("tid") tid: number,
     @Res() res: Response
   ) {
-    const buffer = await this.yearService.exportTimetableToExcel(id)
+    const buffer = await this.yearService.exportTimetableToExcel(id, tid)
     res.set({
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": "attachment",
+      "Content-Disposition": "attachment; filename=timetable.xlsx",
       "Content-Length": buffer.length
     })
     res.send(buffer)
