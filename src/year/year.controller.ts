@@ -46,6 +46,18 @@ export class YearController {
     res.send(buffer)
   }
 
+  @Get(":id/export")
+  async exportYearTimetable(@Param("id") id: number, @Res() res: Response) {
+    const buffer = await this.yearService.exportAllClassesToExcel(id)
+    res.set({
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": "attachment; filename=timetable.xlsx",
+      "Content-Length": buffer.length
+    })
+    res.send(buffer)
+  }
+
   @Get(":id")
   async findOne(@Param("id") id: string) {
     return await this.yearService.findOne(+id)

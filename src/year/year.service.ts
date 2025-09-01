@@ -501,4 +501,217 @@ export class YearService {
     const buffer = await workbook.xlsx.writeBuffer()
     return Buffer.from(buffer)
   }
+
+  async exportAllClassesToExcel(yearId: number): Promise<Buffer> {
+  // Get all classrooms for this year to build dynamic columns
+  const classroomsResult = await this.db.execute(sql`
+    SELECT id, name 
+    FROM classroom 
+    WHERE "yearId" = ${yearId} 
+    ORDER BY name
+  `);
+  
+  const classrooms = classroomsResult.rows;
+  
+  // Build dynamic SQL with conditional aggregation for each classroom
+  const classroomColumns = classrooms.map(classroom => 
+    `MAX(CASE WHEN c.id = ${classroom.id} THEN t.code END) as "${classroom.name}"`
+  ).join(',\n    ');
+
+  // Single SQL query that creates the pivot table structure
+  const result = await this.db.execute(sql`
+    WITH day_timeslot_combinations AS (
+      SELECT 
+        day_name,
+        day_order,
+        ts.id as timeslot_id,
+        ts.label as timeslot_label,
+        ts."sortOrder" as timeslot_order
+      FROM (
+        VALUES 
+          ('monday', 'ច័ន្ទ', 1),
+          ('tuesday', 'អង្គារ', 2), 
+          ('wednesday', 'ពុធ', 3),
+          ('thursday', 'ព្រហស្បតិ៍', 4),
+          ('friday', 'សុក្រ', 5),
+          ('saturday', 'សៅរ៍', 6)
+      ) AS days(day_name, day_label, day_order)
+      CROSS JOIN timeslot ts
+      INNER JOIN year y ON y."classDuration" = ts.duration
+      WHERE y.id = ${yearId}
+    ),
+    pivot_data AS (
+      SELECT 
+        dtc.day_label,
+        dtc.day_order,
+        dtc.timeslot_label,
+        dtc.timeslot_order,
+        ${classroomColumns}
+      FROM day_timeslot_combinations dtc
+      LEFT JOIN "classAssignment" ca ON ca."timeslotId" = dtc.timeslot_id 
+        AND ca.day = dtc.day_name 
+        AND ca."yearId" = ${yearId}
+      LEFT JOIN classroom c ON c.id = ca."classroomId"
+      LEFT JOIN teacher t ON t.id = ca."teacherId"
+      GROUP BY dtc.day_label, dtc.day_order, dtc.timeslot_label, dtc.timeslot_order
+      ORDER BY dtc.day_order, dtc.timeslot_order
+    )
+    SELECT * FROM pivot_data
+  `);
+
+  // Get year name for title
+  const yearResult = await this.db.execute(sql`
+    SELECT name FROM year WHERE id = ${yearId}
+  `);
+  
+  const yearName = yearResult.rows[0]?.name || 'Unknown Year';
+
+  // Create Excel workbook
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet("All Classes Timetable");
+  
+  // Calculate last column for merging (B + number of classrooms)
+  const lastColumnIndex = classrooms.length + 1; // +1 for timeslot column
+  const lastColumn = String.fromCharCode(65 + lastColumnIndex); // A=65, so A+lastColumnIndex
+  
+  // Title row
+  worksheet.mergeCells(`A1:${lastColumn}1`);
+  const titleCell = worksheet.getCell('A1');
+  titleCell.value = `កាលវិភាគបង្រៀនទូទៅ - ${yearName}`;
+  titleCell.font = { bold: true, size: 16 };
+  titleCell.alignment = { horizontal: 'center' };
+  titleCell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: 'FFE6F3FF' }
+  };
+  
+  // Headers row
+  const headerRow = worksheet.getRow(3);
+  headerRow.getCell(1).value = 'ថ្ងៃ'; // Day
+  headerRow.getCell(2).value = 'ម៉ោងរៀន'; // Time
+  
+  // Classroom headers starting from column C
+  classrooms.forEach((classroom, index) => {
+    const cell = headerRow.getCell(index + 3);
+    cell.value = classroom.name;
+    cell.font = { bold: true };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFD9D9D9' }
+    };
+  });
+  
+  // Style header row
+  for (let i = 1; i <= classrooms.length + 2; i++) {
+    const cell = headerRow.getCell(i);
+    if (i <= 2) {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFD9D9D9' }
+      };
+    }
+    cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+  }
+  
+  // Data rows
+  let currentRow = 4;
+  let currentDay = '';
+  let dayStartRow = 0;
+  
+  result.rows.forEach((row, index) => {
+    const worksheetRow = worksheet.getRow(currentRow);
+    
+    // Handle day column merging
+    if (row.day_label !== currentDay) {
+      // Merge previous day's cells if needed
+      if (currentDay && dayStartRow < currentRow - 1) {
+        worksheet.mergeCells(`A${dayStartRow}:A${currentRow - 1}`);
+      }
+      
+      currentDay = row.day_label;
+      dayStartRow = currentRow;
+      
+      worksheetRow.getCell(1).value = row.day_label;
+      worksheetRow.getCell(1).font = { bold: true };
+      worksheetRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+      worksheetRow.getCell(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFF0F0F0' }
+      };
+    }
+    
+    // Timeslot column
+    worksheetRow.getCell(2).value = row.timeslot_label;
+    worksheetRow.getCell(2).alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheetRow.getCell(2).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF8F8F8' }
+    };
+    
+    // Teacher assignments for each classroom
+    classrooms.forEach((classroom, classIndex) => {
+      const cell = worksheetRow.getCell(classIndex + 3);
+      cell.value = row[classroom.name] || '';
+      cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+    
+    // Add borders to day and timeslot columns
+    worksheetRow.getCell(1).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+    worksheetRow.getCell(2).border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' }
+    };
+    
+    currentRow++;
+    
+    // Merge last day's cells if this is the last row
+    if (index === result.rows.length - 1 && dayStartRow < currentRow - 1) {
+      worksheet.mergeCells(`A${dayStartRow}:A${currentRow - 1}`);
+    }
+  });
+  
+  // Set column widths
+  worksheet.getColumn(1).width = 12; // Day column
+  worksheet.getColumn(2).width = 15; // Timeslot column
+  for (let i = 3; i <= classrooms.length + 2; i++) {
+    worksheet.getColumn(i).width = 12; // Class columns
+  }
+  
+  // Footer
+  const footerRowNum = currentRow + 1;
+  worksheet.mergeCells(`A${footerRowNum}:${lastColumn}${footerRowNum}`);
+  const footerCell = worksheet.getCell(`A${footerRowNum}`);
+  footerCell.value = `បានបង្កើតនៅថ្ងៃទី ${new Date().toLocaleDateString("km-KH")} ម៉ោង ${new Date().toLocaleTimeString("km-KH")}`;
+  footerCell.font = { italic: true, size: 10 };
+  footerCell.alignment = { horizontal: 'center' };
+  
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
+}
 }
